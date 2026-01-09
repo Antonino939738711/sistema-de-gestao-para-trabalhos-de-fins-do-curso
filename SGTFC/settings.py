@@ -3,10 +3,9 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# NUNCA deixar hardcoded em produção
-SECRET_KEY = 'django-insecure-o10(c6z45(wq6ur=5ju$c!ln!-=^2yqs=tp3bhzp3b=)amtp^8'
+# ⚠️ Hardcoded para teste
+SECRET_KEY = 'django-insecure-o10(c6z45(wq6ur-5ju$c!ln!-=^2yqs=tp3bhzp3b=)amtp^8'
 
-# Em produção deve ser False
 DEBUG = False
 
 ALLOWED_HOSTS = [
@@ -16,7 +15,7 @@ ALLOWED_HOSTS = [
 ]
 
 INSTALLED_APPS = [
-    'whitenoise.runserver_nostatic',
+    'whitenoise.runserver_nostatic',  # Para produção
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -29,7 +28,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise deve vir logo após SecurityMiddleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve arquivos estáticos
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -56,9 +55,9 @@ TEMPLATES = [
     },
 ]
 
-# Deve existir app = get_wsgi_application() em SGTFC/wsgi.py
-WSGI_APPLICATION = 'SGTFC.wsgi.application'  # Corrigido de 'app' para 'application'
+WSGI_APPLICATION = 'SGTFC.wsgi.application'
 
+# ⚠️ Hardcoded DB para teste
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -84,22 +83,17 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ---- CONFIGURAÇÃO CORRETA DE ESTÁTICOS ----
+# Static files
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # String/Path, nunca lista
-
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # Aqui sim é lista
-]
-
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# ---- CONFIGURAÇÃO DE MEDIA ----
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Segurança Vercel
 CSRF_TRUSTED_ORIGINS = ["https://*.vercel.app"]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
