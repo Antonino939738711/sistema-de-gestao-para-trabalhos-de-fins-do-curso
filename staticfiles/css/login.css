@@ -1,0 +1,22 @@
+#btn-entrar{
+background-color:  #1B5561;
+}
+#btn-entrar:hover{
+    background-color: #F48853;
+}
+
+#title-cada{
+ color:  #1B5561; 
+}
+
+#ad:hover{
+    color:  #1B5561;
+    opacity: 60%;
+}
+#sair{
+    background-color:red;
+}
+#sair:hover{
+    color:  #1B5561;
+ 
+}

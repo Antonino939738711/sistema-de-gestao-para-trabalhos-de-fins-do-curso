@@ -3,11 +3,10 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-uod+*=%7@x**swxug7=sfcom6nlrcbu@8z^1gjy4ch30jnoyp8'
+SECRET_KEY = 'django-insecure-o10(c6z45(wq6ur=5ju$c!ln!-=^2yqs=tp3bhzp3b=)amtp^8'
 
-# Em produção na Vercel, mantenha False. 
-# Se der erro 500, mude para True apenas para descobrir o motivo.
-DEBUG = True 
+# Mantenha True até o site abrir, depois mude para False
+DEBUG = False 
 
 ALLOWED_HOSTS = ["*", ".vercel.app", "localhost", "127.0.0.1"]
 
@@ -52,7 +51,7 @@ TEMPLATES = [
     },
 ]
 
-# IMPORTANTE: Apontando para o objeto "app" que criamos no wsgi.py
+# Apontando para o objeto "app" dentro de SGTFC/wsgi.py
 WSGI_APPLICATION = 'SGTFC.wsgi.app'
 
 DATABASES = {
@@ -66,7 +65,7 @@ DATABASES = {
     }
 }
 
-# Seu modelo de usuário personalizado
+# Modelo de usuário dentro do app Coordenacao
 AUTH_USER_MODEL = "Coordenacao.Usuario"
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -77,7 +76,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'pt-br'
-TIME_ZONE = 'America/Sao_Paulo'
+TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
@@ -85,7 +84,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# WhiteNoise para servir arquivos estáticos de forma eficiente
+# Essencial para a Vercel não dar erro 500 nos arquivos estáticos
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = '/media/'
@@ -93,5 +92,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configurações de CSRF para evitar erro 403
-CSRF_TRUSTED_ORIGINS = ["https://*.vercel.app", "https://6bc4a50434b2.ngrok-free.app"]
+CSRF_TRUSTED_ORIGINS = ["https://*.vercel.app"]
