@@ -1,5 +1,4 @@
 {
-  "version": 2,
   "builds": [
     {
       "src": "SGTFC/wsgi.py",
@@ -7,6 +6,10 @@
     }
   ],
   "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/staticfiles/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "SGTFC/wsgi.py"
