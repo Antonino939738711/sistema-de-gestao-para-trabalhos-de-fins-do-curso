@@ -1,20 +1,8 @@
-{
-  "version": 2,
-  "builds": [
-    {
-      "src": "SGTFC/wsgi.py",
-      "use": "@vercel/python",
-      "config": { "runtime": "python3.9" }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "SGTFC/wsgi.py"
-    }
-  ]
+o arquivo jso tambem deve estar desta forma {
+  "builds": [
+    { "src": "SGTFC/wsgi.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "SGTFC/wsgi.py" }
+  ]
 }
