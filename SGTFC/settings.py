@@ -29,7 +29,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise deve vir logo após SecurityMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -57,7 +57,7 @@ TEMPLATES = [
 ]
 
 # Deve existir app = get_wsgi_application() em SGTFC/wsgi.py
-WSGI_APPLICATION = 'SGTFC.wsgi.app'
+WSGI_APPLICATION = 'SGTFC.wsgi.application'  # Corrigido de 'app' para 'application'
 
 DATABASES = {
     'default': {
@@ -84,21 +84,22 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
-STATIC_ROOT = [os.path.join(BASE_DIR, 'staticfiles')]
+# ---- CONFIGURAÇÃO CORRETA DE ESTÁTICOS ----
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # String/Path, nunca lista
 
-
-# Evita erro se a pasta static não existir
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # Aqui sim é lista
+]
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# ---- CONFIGURAÇÃO DE MEDIA ----
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Segurança Vercel
 CSRF_TRUSTED_ORIGINS = ["https://*.vercel.app"]
-
-# Necessário para HTTPS na Vercel
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
