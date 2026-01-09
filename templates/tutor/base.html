@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Tutor – Sistema TFC</title>
+  <script src="{% static 'css/3.4.js' %}"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            surface: '#f4f5f7',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Esconde a barra de rolagem do body para evitar scroll duplo */
+    body { overflow: hidden; }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+  </style>
+</head>
+
+<body class="bg-surface h-screen flex font-sans text-gray-800">
+
+  <aside id="sidebar" 
+         class="w-64 bg-white shadow-xl flex flex-col fixed md:sticky top-0 h-screen inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition duration-300 z-50">
+
+    <div class="p-5 flex-shrink-0 flex items-center justify-between border-b">
+      <h1 class="text-xl font-semibold text-primary flex items-center gap-2">
+        <span class="material-icons-sharp text-3xl">school</span>
+        Painel Tutor
+      </h1>
+      <button id="closeSidebar" class="md:hidden text-gray-600">
+        <span class="material-icons-sharp">close</span>
+      </button>
+    </div>
+
+    <nav class="flex-1 p-5 space-y-2 overflow-y-auto custom-scrollbar">
+
+      <a href="{% url 'dashboard_tutor' %}" class="flex items-center gap-3 p-2 rounded hover:bg-primary/10 text-primary font-medium">
+        <span class="material-icons-sharp">dashboard</span> Dashboard
+      </a>
+
+      <div class="submenu">
+        <button class="w-full flex items-center justify-between p-2 rounded hover:bg-primary/10 transition">
+          <div class="flex items-center gap-3">
+            <span class="material-icons-sharp">description</span> Temas de TFC
+          </div>
+          <span class="material-icons-sharp transition-transform duration-200">expand_more</span>
+        </button>
+        <div class="submenu-content hidden ml-10 mt-1 space-y-1">
+          <a href="{% url 'dashboard_tutor' %}" class="block p-2 rounded hover:bg-primary/10 text-sm">Lista de Temas</a>
+        </div>
+      </div>
+
+      <a href="#" class="flex items-center gap-3 p-2 rounded hover:bg-primary/10 transition">
+        <span class="material-icons-sharp">upload_file</span> Documentos
+      </a>
+
+      <a href="#" class="flex items-center gap-3 p-2 rounded hover:bg-primary/10 transition">
+        <span class="material-icons-sharp">settings</span> Configurações
+      </a>
+
+      <a href="{% url 'tutor_chat_estudantes' %}" class="flex items-center gap-3 p-2 rounded hover:bg-primary/10 text-green-600 font-semibold transition">
+        <span class="material-icons-sharp">chat</span> Chat
+      </a>
+    </nav>
+
+    <div class="p-5 border-t flex-shrink-0">
+      <a href="{% url 'sair' %}" class="flex items-center gap-2 text-red-600 font-medium hover:bg-red-50 p-2 rounded transition">
+        <span class="material-icons-sharp">logout</span> Sair
+      </a>
+    </div>
+  </aside>
+
+  <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
+
+  <div class="flex-1 flex flex-col h-screen overflow-hidden">
+
+    <header class="flex-shrink-0 flex items-center justify-between bg-white shadow-sm p-4 z-40">
+      <div class="flex items-center gap-3">
+        <button id="openSidebar" class="md:hidden text-gray-700 p-1 hover:bg-gray-100 rounded">
+          <span class="material-icons-sharp text-2xl">menu</span>
+        </button>
+        <h2 class="text-lg font-semibold">{% block titulo_pagina %}Painel do Tutor{% endblock %}</h2>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <button class="text-gray-500 hover:text-primary transition">
+            <span class="material-icons-sharp">notifications</span>
+        </button>
+        <div class="h-8 w-px bg-gray-200 mx-1"></div>
+        <img src="{% static 'imgs/icons/finalispbie.jpg' %}" class="w-10 h-10 rounded-full border-2 border-primary object-cover">
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+      <div class="max-w-7xl mx-auto">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    const openSidebar = document.getElementById("openSidebar");
+    const closeSidebar = document.getElementById("closeSidebar");
+
+    function toggleSidebar() {
+        sidebar.classList.toggle("-translate-x-full");
+        overlay.classList.toggle("hidden");
+    }
+
+    openSidebar?.addEventListener("click", toggleSidebar);
+    closeSidebar?.addEventListener("click", toggleSidebar);
+    overlay?.addEventListener("click", toggleSidebar);
+
+    // Submenus
+    document.querySelectorAll(".submenu").forEach(menu => {
+      const btn = menu.querySelector("button");
+      const content = menu.querySelector(".submenu-content");
+      const icon = btn.querySelector(".material-icons-sharp:last-child");
+
+      btn.addEventListener("click", () => {
+        content.classList.toggle("hidden");
+        icon.classList.toggle("rotate-180");
+      });
+    });
+  </script>
+
+</body>
+</html>

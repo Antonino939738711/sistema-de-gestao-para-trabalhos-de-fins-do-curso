@@ -1,0 +1,227 @@
+{% extends 'Estudante/base.html' %}
+{% load static %}
+{% block titulo_pagina %}Gestão de Temas{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6">
+
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+        <h1 class="text-2xl font-bold text-gray-800">Gestão de Temas</h1>
+
+        <button 
+            class="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+            id="btnProporTema"
+            {% if temas %} disabled {% else %} onclick="showProposta()" {% endif %}>
+            Propor Tema
+        </button>
+    </div>
+
+    <div class="mb-4 space-y-2">
+        {% for message in messages %}
+            <div class="px-4 py-2 rounded text-sm text-center
+                {% if message.tags == 'error' %} bg-red-100 border border-red-400 text-red-700
+                {% elif message.tags == 'success' %} bg-green-100 border border-green-400 text-green-700
+                {% else %} bg-gray-100 border border-gray-400 text-gray-700 {% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- FORMULÁRIO -->
+    <div id="tema" class="bg-white p-6 rounded-xl shadow-md border mb-10 hidden">
+        <h2 id="formTitulo" class="text-xl font-semibold text-gray-800 mb-4">
+            {% if temas %}Editar Tema{% else %}Propor Novo Tema{% endif %}
+        </h2>
+        
+        <form method="POST" action="{% url 'criar_ou_editar_tema' %}" enctype="multipart/form-data" class="space-y-4" id="formTema" onsubmit="return validateForm(event)">
+            {% csrf_token %}
+            <div>
+                <label class="block mb-1 font-medium text-gray-700">Título do Tema</label>
+                <input type="text" name="titulo" id="inputTitulo" class="w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500" required>
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium text-gray-700">Resumo</label>
+                <textarea name="descricao" id="inputDescricao" rows="4" class="w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500" required oninput="updateWordCount()"></textarea>
+                <p id="wordCount" class="text-sm mt-1 text-gray-500">0 / 250 palavras</p>
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium text-gray-700">Requerimento (PDF/Word)</label>
+                <input type="file" name="requerimento" id="inputRequerimento" accept=".pdf,.doc,.docx" class="w-full p-2 border rounded-lg bg-gray-50">
+                <p class="text-sm mt-1" id="arquivoAtual"></p>
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium text-gray-700">Escolha um Tutor</label>
+                <select name="tutor_indicado" id="selectTutor" class="w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500" required>
+                    <option value="">Selecione...</option>
+                    {% for tutor in tutores %}
+                        <option value="{{ tutor.id }}">{{ tutor.nome }} {{ tutor.sobrenome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button class="w-full sm:w-auto bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition" id="btnSubmit">
+                {% if temas %}Salvar Alterações{% else %}Enviar Proposta{% endif %}
+            </button>
+        </form>
+    </div>
+
+    <!-- LISTA DE TEMAS -->
+    <div id="listatemas" class="bg-white p-6 rounded-xl shadow-md border">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Meus Temas</h2>
+
+        {% if temas %}
+
+            <!-- TABELA DESKTOP -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-3 text-left text-sm font-medium text-gray-600 uppercase">Título</th>
+                            <th class="p-3 text-left text-sm font-medium text-gray-600 uppercase">Tutor</th>
+                            <th class="p-3 text-left text-sm font-medium text-gray-600 uppercase">Status Tutor</th>
+                            <th class="p-3 text-left text-sm font-medium text-gray-600 uppercase">Status Coordenação</th>
+                            <th class="p-3 text-left text-sm font-medium text-gray-600 uppercase">Status Final</th>
+                            <th class="p-3 text-left text-sm font-medium text-gray-600 uppercase">Requerimento</th>
+                            <th class="p-3 text-left text-sm font-medium text-gray-600 uppercase">Data</th>
+                            <th class="p-3 text-left text-sm font-medium text-gray-600 uppercase">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for tema in temas %}
+                        {% with tutor_id=tema.tutor_indicado.id|default_if_none:"" %}
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="p-3 text-gray-800 font-medium">{{ tema.titulo }}</td>
+                            <td class="p-3 text-gray-600">
+                                {% if tema.tutor_indicado %}
+                                    {{ tema.tutor_indicado.nome }} {{ tema.tutor_indicado.sobrenome }}
+                                {% else %}—{% endif %}
+                            </td>
+                            <td class="p-3">{{ tema.status_tutor|title }}</td>
+                            <td class="p-3">{{ tema.status_coordenacao|title }}</td>
+                            <td class="p-3">{{ tema.status_final|title }}</td>
+                            <td class="p-3">
+                                {% if tema.requerimento %}
+                                    <a href="{{ tema.requerimento.url }}" target="_blank" class="text-indigo-600 underline">Ver</a>
+                                {% else %}—{% endif %}
+                            </td>
+                            <td class="p-3">{{ tema.data_envio|date:"d/m/Y" }}</td>
+                            <td class="p-3">
+                                
+                                    <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
+                                            onclick="editarTema('{{ tema.id }}', '{{ tema.titulo|escapejs }}', '{{ tema.descricao|escapejs }}', '{{ tutor_id }}', '{% if tema.requerimento %}{{ tema.requerimento.url }}{% endif %}')">
+                                        Editar
+                                    </button>
+                               
+                            </td>
+                        </tr>
+                        {% endwith %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- CARDS MOBILE -->
+            <div class="md:hidden space-y-4">
+                {% for tema in temas %}
+                <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 shadow-sm">
+                    <div class="mb-2 pb-2 border-b border-gray-200">
+                        <span class="text-lg font-bold text-gray-800 block">{{ tema.titulo }}</span>
+                    </div>
+                    <div class="space-y-1 text-sm text-gray-700">
+                        <p><strong>Tutor:</strong> {% if tema.tutor_indicado %}{{ tema.tutor_indicado.nome }} {{ tema.tutor_indicado.sobrenome }}{% else %}—{% endif %}</p>
+                        <p><strong>Status Tutor:</strong> {{ tema.status_tutor|title }}</p>
+                        <p><strong>Status Coordenação:</strong> {{ tema.status_coordenacao|title }}</p>
+                        <p><strong>Status Final:</strong> {{ tema.status_final|title }}</p>
+                        <p><strong>Requerimento:</strong> 
+                            {% if tema.requerimento %}
+                                <a href="{{ tema.requerimento.url }}" target="_blank" class="text-indigo-600 underline">Ver</a>
+                            {% else %}—{% endif %}
+                        </p>
+                        <p><strong>Data:</strong> {{ tema.data_envio|date:"d/m/Y" }}</p>
+                        <div class="mt-2">
+                            
+                                <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition w-full"
+                                        onclick="editarTema('{{ tema.id }}', '{{ tema.titulo|escapejs }}', '{{ tema.descricao|escapejs }}', '{{ tema.tutor_indicado.id|default_if_none:'' }}', '{% if tema.requerimento %}{{ tema.requerimento.url }}{% endif %}')">
+                                    Editar
+                                </button>
+                           
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <p class="text-gray-600 mt-4">Nenhum tema cadastrado ainda.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const MAX_WORDS = 250;
+
+function showProposta() {
+    const temaDiv = document.getElementById("tema");
+    const listaDiv = document.getElementById("listatemas");
+    listaDiv.classList.add("hidden");
+    temaDiv.classList.remove("hidden");
+    updateWordCount();
+}
+
+function showListaTemas() {
+    const temaDiv = document.getElementById("tema");
+    const listaDiv = document.getElementById("listatemas");
+    listaDiv.classList.remove("hidden");
+    temaDiv.classList.add("hidden");
+}
+
+function editarTema(id, titulo, descricao, tutorId, requerimentoUrl) {
+    showProposta();
+    document.getElementById("formTitulo").innerText = "Editar Tema (Rejeitado pela Coordenação)";
+    document.getElementById("inputTitulo").value = titulo;
+    document.getElementById("inputDescricao").value = descricao;
+    document.getElementById("selectTutor").value = tutorId || '';
+    document.getElementById("arquivoAtual").innerHTML = requerimentoUrl ? `Arquivo atual: <a href="${requerimentoUrl}" target="_blank" class="text-indigo-600 underline">Ver</a>` : '';
+    document.getElementById("btnSubmit").innerText = "Salvar Alterações";
+    updateWordCount();
+}
+
+function countWords(text) {
+    text = text.trim();
+    if (text === "") return 0;
+    return text.split(/\s+/).length;
+}
+
+function updateWordCount() {
+    const textarea = document.getElementById("inputDescricao");
+    const counter = document.getElementById("wordCount");
+    const wordCount = countWords(textarea.value);
+    counter.textContent = `${wordCount} / ${MAX_WORDS} palavras`;
+    if (wordCount > MAX_WORDS) {
+        counter.classList.remove("text-gray-500");
+        counter.classList.add("text-red-600");
+        textarea.classList.add("border-red-500");
+    } else {
+        counter.classList.remove("text-red-600");
+        counter.classList.add("text-gray-500");
+        textarea.classList.remove("border-red-500");
+    }
+}
+
+function validateForm(event) {
+    const textarea = document.getElementById("inputDescricao");
+    const wordCount = countWords(textarea.value);
+    if (wordCount > MAX_WORDS) { alert(`O Resumo excedeu o limite de ${MAX_WORDS} palavras.`); updateWordCount(); return false; }
+    if (wordCount === 0) { alert("O Resumo não pode estar vazio."); return false; }
+    return true;
+}
+
+document.addEventListener('DOMContentLoaded', updateWordCount);
+</script>
+{% endblock %}

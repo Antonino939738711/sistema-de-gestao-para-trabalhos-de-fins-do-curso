@@ -1,0 +1,214 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo – Sistema TFC </title>
+  <script src="{% static 'css/3.4.js' %}"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primary: '#3b82f6', surface: '#f4f5f7' }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    #sidebar::-webkit-scrollbar { width: 0px; background: transparent; }
+    body { overflow: hidden; }
+  </style>
+</head>
+
+<body class="bg-surface h-screen flex font-sans text-gray-800">
+
+  <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity"></div>
+
+  <aside id="sidebar" class="fixed md:sticky top-0 left-0 h-screen w-64 bg-white shadow-xl flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out border-r">
+
+    <div class="p-5 flex items-center justify-between border-b shrink-0 bg-white">
+      <h1 class="text-xl font-bold text-primary flex items-center gap-2">
+        <span class="material-icons-sharp text-3xl">school</span>
+        TFC Admin
+      </h1>
+      <button id="closeSidebar" class="md:hidden text-gray-500 hover:text-red-500">
+        <span class="material-icons-sharp">close</span>
+      </button>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto p-4 space-y-1 custom-scrollbar">
+      
+      {% if request.user.perfil != "presidente" %}
+      <a href="{% url 'admink' %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-primary/10 text-primary font-bold transition-all">
+        <span class="material-icons-sharp">dashboard</span> Dashboard
+      </a>
+      
+      <div class="submenu">
+        <button class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 transition-all group">
+          <div class="flex items-center gap-3 text-gray-600 group-hover:text-primary">
+            <span class="material-icons-sharp">groups</span> Estudantes
+          </div>
+          <span class="material-icons-sharp text-gray-400 transition-transform duration-300">expand_more</span>
+        </button>
+        <div class="submenu-content hidden pl-11 pr-2 py-1 space-y-1">
+          <a href="{% url 'lista_estudantes' %}" class="block p-2 text-sm text-gray-500 hover:text-primary rounded-lg transition-colors">Lista Geral</a>
+          <a href="{% url 'add_estudante' %}" class="block p-2 text-sm text-gray-500 hover:text-primary rounded-lg transition-colors">Adicionar Novo</a>
+        </div>
+      </div>
+
+      <div class="submenu">
+        <button class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 transition-all group">
+          <div class="flex items-center gap-3 text-gray-600 group-hover:text-primary">
+            <span class="material-icons-sharp">description</span> Temas de TFC
+          </div>
+          <span class="material-icons-sharp text-gray-400 transition-transform duration-300">expand_more</span>
+        </button>
+        <div class="submenu-content hidden pl-11 pr-2 py-1 space-y-1">
+          <a href="{% url 'lista_reprovados' %}" class="block p-2 text-sm text-gray-500 hover:text-primary rounded-lg">Solicitações</a>
+          <a href="{% url 'lista_aprovados' %}" class="block p-2 text-sm text-gray-500 hover:text-primary rounded-lg">Aprovados</a>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if request.user.perfil == "cordenacao" %}
+      <div class="submenu">
+        <button class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 transition-all group">
+          <div class="flex items-center gap-3 text-gray-600 group-hover:text-primary">
+            <span class="material-icons-sharp">person_add</span> Orientadores
+          </div>
+          <span class="material-icons-sharp text-gray-400 transition-transform duration-300">expand_more</span>
+        </button>
+        <div class="submenu-content hidden pl-11 pr-2 py-1 space-y-1">
+          <a href="#" class="block p-2 text-sm text-gray-500 hover:text-primary rounded-lg transition-colors">Lista de Orientadores</a>
+          <a href="{% if tema %} {% url 'adicionar_orientador' tema.id %} {% else %} # {% endif %}" 
+   class="block p-2 text-sm text-gray-500 hover:text-primary rounded-lg transition-colors font-semibold text-primary {% if not tema %}opacity-50 cursor-not-allowed{% endif %}">
+   Atribuir Orientador
+</a>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if request.user.perfil == "presidente" %}
+      <a href="#" class="flex items-center gap-3 p-3 rounded-xl hover:bg-primary/10 transition-colors font-medium text-gray-600 hover:text-primary">
+        <span class="material-icons-sharp">school</span> Gestão Acadêmica
+      </a>
+      <a href="#" class="flex items-center gap-3 p-3 rounded-xl hover:bg-primary/10 transition-colors font-medium text-gray-600 hover:text-primary">
+        <span class="material-icons-sharp">account_balance</span> Finanças
+      </a>
+      <div class="submenu">
+        <button class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 transition-all group">
+          <div class="flex items-center gap-3 text-gray-600 group-hover:text-primary">
+            <span class="material-icons-sharp">groups</span> Estudantes
+          </div>
+          <span class="material-icons-sharp text-gray-400 transition-transform duration-300">expand_more</span>
+        </button>
+        <div class="submenu-content hidden pl-11 pr-2 py-1 space-y-1">
+          <a href="{% url 'lista_estudantes' %}" class="block p-2 text-sm text-gray-500 hover:text-primary rounded-lg transition-colors">Lista Geral</a>
+          <a href="{% url 'add_estudante' %}" class="block p-2 text-sm text-gray-500 hover:text-primary rounded-lg transition-colors">Adicionar Novo</a>
+        </div>
+      </div>
+
+      <div class="submenu">
+        <button class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 transition-all group">
+          <div class="flex items-center gap-3 text-gray-600 group-hover:text-primary">
+            <span class="material-icons-sharp">description</span> Temas de TFC
+          </div>
+          <span class="material-icons-sharp text-gray-400 transition-transform duration-300">expand_more</span>
+        </button>
+        <div class="submenu-content hidden pl-11 pr-2 py-1 space-y-1">
+          <a href="{% url 'lista_reprovados' %}" class="block p-2 text-sm text-gray-500 hover:text-primary rounded-lg">Solicitações</a>
+          <a href="{% url 'lista_aprovados' %}" class="block p-2 text-sm text-gray-500 hover:text-primary rounded-lg">Aprovados</a>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if request.user.is_superuser %}
+      <div class="submenu">
+        <button class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 group">
+          <div class="flex items-center gap-3 text-gray-600 group-hover:text-primary font-medium">
+            <span class="material-icons-sharp">supervisor_account</span> Tutores (Superuser)
+          </div>
+          <span class="material-icons-sharp transition-transform duration-300">expand_more</span>
+        </button>
+        <div class="submenu-content hidden pl-11 py-1">
+          <a href="#" class="block p-2 text-sm text-gray-500 hover:text-primary">Lista de Tutores</a>
+        </div>
+      </div>
+      {% endif %}
+
+      <a href="#" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 text-gray-600 hover:text-primary font-medium transition-all">
+        <span class="material-icons-sharp">settings</span> Configurações
+      </a>
+    </nav>
+
+    <div class="p-4 border-t shrink-0 bg-gray-50">
+      <a href="{% url 'sair' %}" class="flex items-center gap-3 p-3 rounded-xl text-red-600 hover:bg-red-50 font-bold transition-all">
+        <span class="material-icons-sharp">logout</span> Sair do Sistema
+      </a>
+    </div>
+  </aside>
+
+  <div class="flex-1 flex flex-col h-screen overflow-hidden">
+    <header class="h-16 flex items-center justify-between bg-white border-b px-6 shrink-0 z-40">
+      <div class="flex items-center gap-4">
+        <button id="openSidebar" class="md:hidden text-gray-700 p-1 hover:bg-gray-100 rounded">
+          <span class="material-icons-sharp text-3xl">menu</span>
+        </button>
+        <h2 class="text-lg font-bold text-gray-700 hidden sm:block">Painel de Controle</h2>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="text-right hidden sm:block">
+            <p class="text-xs font-bold text-gray-800">{{ request.user.nome }}</p>
+            <p class="text-[10px] text-gray-500 uppercase">{{ request.user.perfil }}</p>
+        </div>
+        <div class="relative">
+            <img src="{% static 'imgs/icons/finalispbie.jpg' %}" class="w-10 h-10 rounded-full border-2 border-primary object-cover">
+            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+      <div class="max-w-7xl mx-auto">
+        {% block content %}
+        {% endblock %}
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    const openBtn = document.getElementById("openSidebar");
+    const closeBtn = document.getElementById("closeSidebar");
+
+    function toggleSidebar() {
+      sidebar.classList.toggle("-translate-x-full");
+      overlay.classList.toggle("hidden");
+    }
+
+    openBtn?.addEventListener("click", toggleSidebar);
+    closeBtn?.addEventListener("click", toggleSidebar);
+    overlay?.addEventListener("click", toggleSidebar);
+
+    document.querySelectorAll(".submenu").forEach(menu => {
+      const btn = menu.querySelector("button");
+      const content = menu.querySelector(".submenu-content");
+      const icon = btn.querySelector(".material-icons-sharp:last-child");
+
+      btn.addEventListener("click", () => {
+        content.classList.toggle("hidden");
+        icon.classList.toggle("rotate-180");
+        btn.classList.toggle('bg-gray-50');
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+{% extends 'Estudante/base.html' %}
+{% load static %}
+
+{% block titulo_pagina %}Recomendações do Tutor{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 md:py-12">
+    
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-4">
+        <div class="text-center md:text-left">
+            <h2 class="text-2xl md:text-4xl font-extrabold text-slate-800 tracking-tight animate-fadeSlide">
+                Painel de Orientações
+            </h2>
+            <p class="text-slate-500 mt-2 text-sm md:text-base opacity-80">
+                Acompanhe as recomendações detalhadas para o seu trabalho.
+            </p>
+        </div>
+        
+        {% if recomendacoes %}
+        <div class="hidden md:block animate-fadeSlide">
+            <a href="#" class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl hover:bg-slate-50 transition shadow-sm font-semibold text-sm">
+                <span class="material-icons-sharp text-red-500 text-lg">picture_as_pdf</span>
+                Exportar Histórico
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if recomendacoes %}
+        <div class="bg-white border border-slate-200 rounded-2xl md:rounded-[2rem] shadow-sm overflow-hidden animate-fade">
+            
+            <div class="bg-slate-900 p-5 md:p-10">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div class="space-y-1">
+                        <span class="text-blue-400 text-[10px] font-black uppercase tracking-[0.2em]">TEMA</span>
+                        <h3 class="text-white text-lg md:text-2xl font-bold leading-tight break-words">
+                            {{ recomendacoes.0.tema.titulo }}
+                        </h3>
+                    </div>
+                    
+                    <div class="inline-flex items-center gap-3 bg-white/5 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/10 self-start md:self-center">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shadow-lg">
+                            <i class="fas fa-user-tie text-white text-xs"></i>
+                        </div>
+                        <span class="text-white text-xs md:text-sm font-medium">
+                            Tutor: {{ recomendacoes.0.tutor.nome|default:recomendacoes.0.tutor.username }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 md:p-10 bg-slate-50/30">
+                <div class="space-y-6 md:space-y-8">
+                    {% for rec in recomendacoes %}
+                    <div class="flex gap-4 md:gap-8 group">
+                        
+                        <div class="flex flex-col items-center flex-shrink-0">
+                            <div class="flex-none w-9 h-9 md:w-11 md:h-11 rounded-xl bg-white border-2 border-blue-500 text-blue-600 flex items-center justify-center text-sm md:text-lg font-bold shadow-sm transition-all duration-300 group-hover:bg-blue-600 group-hover:text-white">
+                                {{ forloop.counter }}
+                            </div>
+                            {% if not forloop.last %}
+                            <div class="w-px h-full bg-slate-200 mt-3"></div>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex-1 pb-8">
+                            <div class="bg-white border border-slate-200 rounded-2xl p-5 md:p-7 shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-blue-100">
+                                <div class="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-slate-50 pb-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nota #{{ forloop.counter }}</span>
+                                    </div>
+                                    <span class="text-[10px] md:text-xs text-slate-400 font-medium bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
+                                        <i class="far fa-calendar-alt mr-1.5 text-blue-500"></i> {{ rec.data_criacao|date:"d M Y | H:i" }}
+                                    </span>
+                                </div>
+                                <p class="text-slate-700 text-sm md:text-base leading-[1.8] break-words whitespace-pre-line">
+                                    {{ rec.texto }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-8 pt-8 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <p class="text-slate-400 text-xs text-center md:text-left">
+                        Documento gerado automaticamente pelo Sistema TFC em {% now "d/m/Y" %}.
+                    </p>
+                    
+                    <a href="{% url 'baixar_recomendacoes' request.user.id %}" class="w-full md:w-auto inline-flex items-center justify-center gap-3 bg-slate-900 text-white px-8 py-4 rounded-2xl hover:bg-blue-600 transition-all duration-300 shadow-lg shadow-slate-200 active:scale-95 group">
+                        <span class="material-icons-sharp text-white group-hover:animate-bounce">download</span>
+                        <span class="font-bold tracking-tight">Baixar Orientações (PDF)</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        {% endif %}
+</div>
+
+{% endblock %}

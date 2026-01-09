@@ -1,0 +1,181 @@
+{% extends 'tutor/base.html' %}
+
+{% block content %}
+
+<h2 class="text-2xl font-bold mb-5 px-4 sm:px-0 animate-fadeSlide">Lista de Estudantess – Tutor</h2>
+
+<div class="bg-white shadow rounded p-4 overflow-x-auto animate-fade">
+
+    <!-- MENSAGENS -->
+    <div class="mb-4 space-y-2">
+        {% for message in messages %}
+        <div class="px-4 py-2 rounded text-sm text-center
+                    {% if message.tags == 'error' %} bg-red-100 border border-red-400 text-red-700
+                    {% elif message.tags == 'success' %} bg-green-100 border border-green-400 text-green-700
+                    {% else %} bg-gray-100 border border-gray-400 text-gray-700 {% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- FORMULÁRIO MULTISELEÇÃO -->
+    <form method="POST" action="{% url 'alterar_status_multiplos_tutor' %}">
+        {% csrf_token %}
+
+        <!-- BOTÕES SUPERIORES -->
+        <div class="flex gap-3 mb-4">
+            <button type="submit" name="acao" value="aprovar"
+                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+                Aprovar Selecionados
+            </button>
+
+            <button type="submit" name="acao" value="rejeitar"
+                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">
+                Rejeitar Selecionados
+            </button>
+        </div>
+
+        <!-- TABELA DESKTOP -->
+        <table class="hidden md:table w-full border-collapse animate-fadeSlow">
+            <thead>
+                <tr class="bg-gray-100 border-b border-gray-300">
+                    <th class="p-3 text-left text-sm font-semibold text-gray-600">
+                        <input type="checkbox" id="selectAll">
+                    </th>
+                    <th class="p-3 text-left text-sm font-semibold text-gray-600">Nome</th>
+                    <th class="p-3 text-left text-sm font-semibold text-gray-600">Curso</th>
+                    <th class="p-3 text-left text-sm font-semibold text-gray-600">Título</th>
+                    <th class="p-3 text-left text-sm font-semibold text-gray-600">Resumo</th>
+                    <th class="p-3 text-left text-sm font-semibold text-gray-600">Status (Tutor)</th>
+                    <th class="p-3 text-left text-sm font-semibold text-gray-600">Ações</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for estudante in estudantes %}
+                {% with tema=estudante.tema_list.0 %}
+                <tr class="border-b hover:bg-gray-50 transition duration-150">
+
+                    <!-- Checkbox -->
+                    <td class="p-3 text-center">
+                        {% if tema and tema.status_tutor == 'pendente' %}
+                            <input type="checkbox" name="temas_selecionados" value="{{ tema.id }}" class="checkbox-item">
+                        {% endif %}
+                    </td>
+
+                    <!-- Nome -->
+                    <td class="p-3 text-sm text-gray-800">{{ estudante.nome }} {{ estudante.sobrenome }}</td>
+
+                    <!-- Curso -->
+                    <td class="p-3 text-sm text-gray-800">{{ estudante.curso.nome|default:"—" }}</td>
+
+                    <!-- Título -->
+                    <td class="p-3 text-sm text-gray-800">{% if tema %}{{ tema.titulo }}{% else %}—{% endif %}</td>
+
+                    <!-- Resumo -->
+                    <td class="p-3 text-sm text-blue-600">
+                        {% if tema and tema.resumo %}
+                            <a href="{{ tema.resumo.url }}" class="underline hover:text-blue-800 transition">Ver Resumo</a>
+                        {% else %}—{% endif %}
+                    </td>
+
+                    <!-- Status Tutor -->
+                    <td class="p-3 text-sm font-semibold">
+                        {% if tema %}
+                            {% if tema.status_tutor == 'pendente' %}<span class="text-yellow-600">Pendente</span>
+                            {% elif tema.status_tutor == 'aprovado' %}<span class="text-green-600">Aprovado</span>
+                            {% elif tema.status_tutor == 'rejeitado' %}<span class="text-red-600">Rejeitado</span>
+                            {% endif %}
+                        {% else %}—{% endif %}
+                    </td>
+
+                    <!-- Ações -->
+                    <td class="p-3 text-sm flex items-center gap-2">
+                        {% if tema and tema.status_tutor == 'pendente' %}
+                            <a href="{% url 'alterar_status_tema_tutor' tema.id 'aprovado' %}" class="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700">Aprovar</a>
+                            <a href="{% url 'alterar_status_tema_tutor' tema.id 'rejeitado' %}" class="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700">Rejeitar</a>
+                        {% else %}—{% endif %}
+                    </td>
+
+                </tr>
+                {% endwith %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- MOBILE -->
+        <div class="md:hidden space-y-4 mt-4 animate-fade">
+            {% for estudante in estudantes %}
+            {% with tema=estudante.tema_list.0 %}
+            <div class="border border-gray-200 rounded-lg p-4 shadow-sm bg-gray-50">
+
+                <label class="flex items-center gap-2 mb-2">
+                    {% if tema and tema.status_tutor == 'pendente' %}
+                        <input type="checkbox" name="temas_selecionados" value="{{ tema.id }}" class="checkbox-item">
+                        <span class="font-semibold">Selecionar</span>
+                    {% endif %}
+                </label>
+
+                <div class="flex items-center justify-between mb-2 pb-2 border-b border-gray-200">
+                    <span class="text-lg font-bold text-gray-900">{{ estudante.nome }} {{ estudante.sobrenome }}</span>
+                    <span class="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">{{ estudante.curso.nome|default:"Sem Curso" }}</span>
+                </div>
+
+                <div class="space-y-2 text-sm text-gray-700">
+                    <div><strong class="text-gray-600 block">Título:</strong> <span class="pl-2 block">{% if tema %}{{ tema.titulo }}{% else %}—{% endif %}</span></div>
+
+                    <div><strong class="text-gray-600 block">Resumo:</strong>
+                        <span class="pl-2 block">
+                            {% if tema and tema.resumo %}
+                                <a href="{{ tema.resumo.url }}" class="text-green-600 underline font-medium">Acessar Resumo</a>
+                            {% else %}—{% endif %}
+                        </span>
+                    </div>
+
+                    <div><strong class="text-gray-600 block">Status Tutor:</strong>
+                        <span class="pl-2 block font-semibold">
+                            {% if tema %}
+                                {% if tema.status_tutor == 'pendente' %}<span class="text-yellow-600">Pendente</span>
+                                {% elif tema.status_tutor == 'aprovado' %}<span class="text-green-600">Aprovado</span>
+                                {% elif tema.status_tutor == 'rejeitado' %}<span class="text-red-600">Rejeitado</span>{% endif %}
+                            {% else %}—{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                {% if tema and tema.status_tutor == 'pendente' %}
+                <div class="mt-3 flex gap-2">
+                    <a href="{% url 'alterar_status_tema_tutor' tema.id 'aprovado' %}" class="flex-1 text-center bg-green-600 text-white text-xs py-2 rounded hover:bg-green-700">Aprovar</a>
+                    <a href="{% url 'alterar_status_tema_tutor' tema.id 'rejeitado' %}" class="flex-1 text-center bg-red-600 text-white text-xs py-2 rounded hover:bg-red-700">Rejeitar</a>
+                </div>
+                {% endif %}
+
+            </div>
+            {% endwith %}
+            {% endfor %}
+        </div>
+
+    </form>
+</div>
+
+<!-- ANIMAÇÕES -->
+<style>
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.animate-fade { animation: fadeIn .6s ease-out; }
+.animate-fadeSlow { animation: fadeIn 1s ease-out; }
+.animate-fadeSlide { animation: fadeIn .4s ease-out, slideUp .4s ease-out; }
+</style>
+
+<!-- JS Selecionar Todos -->
+<script>
+    const selectAll = document.getElementById("selectAll");
+    const checkboxes = document.querySelectorAll(".checkbox-item");
+
+    selectAll?.addEventListener("change", () => {
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    });
+</script>
+
+{% endblock %}

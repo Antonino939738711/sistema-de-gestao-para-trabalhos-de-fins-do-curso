@@ -1,0 +1,95 @@
+{% extends "Estudante/base.html" %}
+{% load static %}
+
+{% block titulo_pagina %}Actualizar Perfil{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white rounded-xl shadow p-6 space-y-6">
+
+  <h2 class="text-xl font-semibold text-gray-800">
+    Actualizar Perfil
+  </h2>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-6">
+    {% csrf_token %}
+
+    <!-- FOTO -->
+    <div class="flex items-center gap-4">
+      {% if request.user.imagem %}
+        <img src="{{ request.user.imagem.url }}"
+             class="w-20 h-20 rounded-full object-cover border">
+      {% else %}
+        <div class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
+          <span class="material-icons-sharp text-3xl text-gray-500">person</span>
+        </div>
+      {% endif %}
+
+      <input type="file" name="imagem"
+             class="text-sm text-gray-600 file:mr-3 file:py-2 file:px-4
+                    file:rounded-lg file:border-0
+                    file:bg-blue-50 file:text-blue-600">
+    </div>
+
+    <!-- PERFIL (APENAS VISUAL) -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Perfil</label>
+      <input type="text" disabled
+             value="{{ request.user.perfil }}"
+             class="mt-1 w-full rounded-lg bg-gray-100 border-gray-300 text-gray-500">
+    </div>
+
+    <!-- NOME -->
+    <div>
+      <label class="block text-sm font-medium">Nome</label>
+      <input type="text" name="nome" required
+             value="{{ request.user.nome }}"
+             class="mt-1 w-full rounded-lg border-gray-300 focus:ring-blue-500">
+    </div>
+
+    <!-- SOBRENOME -->
+    <div>
+      <label class="block text-sm font-medium">Sobrenome</label>
+      <input type="text" name="sobrenome" required
+             value="{{ request.user.sobrenome }}"
+             class="mt-1 w-full rounded-lg border-gray-300 focus:ring-blue-500">
+    </div>
+
+    <!-- TELEFONE -->
+    <div>
+      <label class="block text-sm font-medium">Telefone</label>
+      <input type="text" name="telefone"
+             value="{{ request.user.telefone }}"
+             class="mt-1 w-full rounded-lg border-gray-300 focus:ring-blue-500">
+    </div>
+
+    <!-- ALTERAR SENHA -->
+    <div class="border-t pt-4 space-y-4">
+      <h3 class="font-semibold text-gray-700">Alterar Senha</h3>
+
+      <input type="password" name="senha_atual"
+             placeholder="Senha actual"
+             class="w-full rounded-lg border-gray-300">
+
+      <input type="password" name="nova_senha"
+             placeholder="Nova senha"
+             class="w-full rounded-lg border-gray-300">
+
+      <input type="password" name="confirmar_senha"
+             placeholder="Confirmar nova senha"
+             class="w-full rounded-lg border-gray-300">
+    </div>
+
+    <!-- BOTÕES -->
+    <div class="flex justify-end gap-3">
+      <a href="{% url 'dashboard_estudante' %}"
+         class="px-4 py-2 border rounded-lg text-gray-600">
+        Cancelar
+      </a>
+      <button type="submit"
+              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        Guardar
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

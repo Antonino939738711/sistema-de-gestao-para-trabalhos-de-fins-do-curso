@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo – Sistema TFC</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+
+  <!-- Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            surface: '#f4f5f7',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-surface min-h-screen flex font-sans text-gray-800">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="w-64 bg-white shadow-xl flex flex-col fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition duration-300 z-50">
+
+    <div class="p-5 flex items-center justify-between border-b">
+      <h1 class="text-xl font-semibold text-primary flex items-center gap-2">
+        <span class="material-icons-sharp text-3xl">school</span>
+        TFC Admin
+      </h1>
+      <button id="closeSidebar" class="md:hidden text-gray-600">
+        <span class="material-icons-sharp">close</span>
+      </button>
+    </div>
+
+    <nav class="flex-1 p-5 space-y-2">
+
+      <a href="#" class="flex items-center gap-3 p-2 rounded hover:bg-primary/10 text-primary font-medium">
+        <span class="material-icons-sharp">dashboard</span> Dashboard
+      </a>
+
+      <div class="submenu">
+        <button class="w-full flex items-center justify-between p-2 rounded hover:bg-primary/10">
+          <div class="flex items-center gap-3">
+            <span class="material-icons-sharp">groups</span> Estudantes
+          </div>
+          <span class="material-icons-sharp transition-transform">expand_more</span>
+        </button>
+        <div class="submenu-content hidden ml-10 mt-1 space-y-1">
+          <a href="#" class="block p-2 rounded hover:bg-primary/10 text-sm">Lista</a>
+          <a href="#" class="block p-2 rounded hover:bg-primary/10 text-sm">Adicionar</a>
+        </div>
+      </div>
+
+      <div class="submenu">
+        <button class="w-full flex items-center justify-between p-2 rounded hover:bg-primary/10">
+          <div class="flex items-center gap-3">
+            <span class="material-icons-sharp">description</span> Temas de TFC
+          </div>
+          <span class="material-icons-sharp transition-transform">expand_more</span>
+        </button>
+        <div class="submenu-content hidden ml-10 mt-1 space-y-1">
+          <a href="#" class="block p-2 rounded hover:bg-primary/10 text-sm">Solicitações</a>
+          <a href="#" class="block p-2 rounded hover:bg-primary/10 text-sm">Aprovados</a>
+        </div>
+      </div>
+
+      <div class="submenu">
+        <button class="w-full flex items-center justify-between p-2 rounded hover:bg-primary/10">
+          <div class="flex items-center gap-3">
+            <span class="material-icons-sharp">supervisor_account</span> Tutores
+          </div>
+          <span class="material-icons-sharp transition-transform">expand_more</span>
+        </button>
+        <div class="submenu-content hidden ml-10 mt-1 space-y-1">
+          <a href="#" class="block p-2 rounded hover:bg-primary/10 text-sm">Lista</a>
+          <a href="#" class="block p-2 rounded hover:bg-primary/10 text-sm">Atribuir TFC</a>
+        </div>
+      </div>
+
+      <a href="#" class="flex items-center gap-3 p-2 rounded hover:bg-primary/10">
+        <span class="material-icons-sharp">upload_file</span> Documentos
+      </a>
+
+      <a href="#" class="flex items-center gap-3 p-2 rounded hover:bg-primary/10">
+        <span class="material-icons-sharp">settings</span> Configurações
+      </a>
+    </nav>
+
+    <div class="p-5 border-t">
+      <a href="{% url 'logout' %}" class="flex items-center gap-2 text-red-600 font-medium">
+        <span class="material-icons-sharp">logout</span> Sair
+      </a>
+    </div>
+  </aside>
+
+  <!-- Conteúdo principal -->
+  <div class="flex-1 flex flex-col">
+
+    <!-- Topbar -->
+    <header class="flex items-center justify-between bg-white shadow-sm p-4 sticky top-0 z-40">
+      <div class="flex items-center gap-3">
+        <button id="openSidebar" class="md:hidden text-gray-700">
+          <span class="material-icons-sharp text-2xl">menu</span>
+        </button>
+        <h2 class="text-lg font-semibold">Painel Administrativo</h2>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="material-icons-sharp">notifications</span>
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-10 h-10 rounded-full border-2 border-primary">
+      </div>
+    </header>
+
+    <!-- Dashboard -->
+    <main class="p-5 space-y-6 overflow-y-auto">
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+        <div class="bg-white p-5 rounded-xl shadow hover:shadow-md">
+          <h3 class="font-semibold text-gray-700">Estudantes</h3>
+          <p class="text-4xl font-bold mt-2">124</p>
+          <p class="text-sm text-gray-500">Cadastrados</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow hover:shadow-md">
+          <h3 class="font-semibold text-gray-700">Temas Pendentes</h3>
+          <p class="text-4xl font-bold mt-2">33</p>
+          <p class="text-sm text-gray-500">Aguardam aprovação</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow hover:shadow-md">
+          <h3 class="font-semibold text-gray-700">Tutores</h3>
+          <p class="text-4xl font-bold mt-2">12</p>
+          <p class="text-sm text-gray-500">Disponíveis</p>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const openSidebar = document.getElementById("openSidebar");
+    const closeSidebar = document.getElementById("closeSidebar");
+
+    openSidebar?.addEventListener("click", () => sidebar.classList.remove("-translate-x-full"));
+    closeSidebar?.addEventListener("click", () => sidebar.classList.add("-translate-x-full"));
+
+    document.querySelectorAll(".submenu").forEach(menu => {
+      const btn = menu.querySelector("button");
+      const content = menu.querySelector(".submenu-content");
+      const icon = btn.querySelector(".material-icons-sharp:last-child");
+
+      btn.addEventListener("click", () => {
+        content.classList.toggle("hidden");
+        icon.classList.toggle("rotate-180");
+      });
+    });
+  </script>
+</body>
+</html>
+

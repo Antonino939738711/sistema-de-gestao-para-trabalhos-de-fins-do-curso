@@ -1,0 +1,95 @@
+
+
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}Dashboard - Sistema TFC{% endblock %}
+
+{% block content %}
+
+<!-- Cards principais -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+
+  <div class="bg-white p-5 rounded-xl shadow hover:shadow-md transition">
+    <div class="flex items-center justify-between">
+      <h3 class="font-semibold text-gray-700">Estudantes</h3>
+      <span class="material-icons-sharp text-indigo-600">school</span>
+    </div>
+    <p class="text-4xl font-bold mt-2">{{ total }}</p>
+    <p class="text-sm text-gray-500">Cadastrados</p>
+  </div>
+
+  <div class="bg-white p-5 rounded-xl shadow hover:shadow-md transition">
+    <div class="flex items-center justify-between">
+      <h3 class="font-semibold text-gray-700">Temas Pendentes</h3>
+      <span class="material-icons-sharp text-yellow-500">hourglass_top</span>
+    </div>
+    <p class="text-4xl font-bold mt-2">{{ total_temas }}</p>
+    <p class="text-sm text-gray-500">Aguardam aprovação</p>
+  </div>
+
+  <div class="bg-white p-5 rounded-xl shadow hover:shadow-md transition">
+    <div class="flex items-center justify-between">
+      <h3 class="font-semibold text-gray-700">Tutores</h3>
+      <span class="material-icons-sharp text-green-600">supervisor_account</span>
+    </div>
+    <p class="text-4xl font-bold mt-2">{{ total_tutor }}</p>
+    <p class="text-sm text-gray-500">Disponíveis</p>
+  </div>
+
+</div>
+
+<!-- Gráficos -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+  <!-- Gráfico geral -->
+  <div class="bg-white p-5 rounded-xl shadow">
+    <h3 class="font-semibold text-gray-700 mb-4">Visão Geral do Sistema</h3>
+    <canvas id="geralChart" class="w-full"></canvas>
+  </div>
+
+  <!-- Gráfico de temas -->
+  <div class="bg-white p-5 rounded-xl shadow">
+    <h3 class="font-semibold text-gray-700 mb-4">Estado dos Temas</h3>
+    <canvas id="temasChart" class="w-full"></canvas>
+  </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  // Gráfico geral
+  new Chart(document.getElementById('geralChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Estudantes', 'Tutores', 'Temas Pendentes'],
+      datasets: [{
+        data: [{{ total }}, {{ total_tutor }}, {{ total_temas }}],
+        backgroundColor: ['#6366f1', '#22c55e', '#facc15']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // Gráfico de temas
+  new Chart(document.getElementById('temasChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Pendentes', 'Aprovados'],
+      datasets: [{
+        data: [{{ total_temas }}, {{ temas_aprovados }}],
+        backgroundColor: ['#facc15', '#22c55e']
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+</script>
+
+{% endblock %}

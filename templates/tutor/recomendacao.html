@@ -1,0 +1,140 @@
+{% extends 'tutor/base.html' %}
+{% load static %}
+
+{% block titulo_pagina %}Painel de Orientação - Tutor{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 md:py-12">
+    
+    <div class="mb-8 md:mb-12 text-center md:text-left">
+        <h2 class="text-2xl md:text-4xl font-extrabold text-slate-800 tracking-tight animate-fadeSlide">
+            Gerenciar Orientações
+        </h2>
+        <p class="text-slate-500 mt-2 text-sm md:text-base opacity-80">
+            Acompanhe e envie novas recomendações para o progresso do estudante.
+        </p>
+    </div>
+{% if messages %}
+      <div class="mb-4 space-y-2">
+        {% for message in messages %}
+          <div class="px-4 py-2 rounded text-sm 
+                      {% if message.tags == 'error' %} bg-red-100 border border-red-400 text-red-700 text-center
+                      {% elif message.tags == 'success' %} bg-green-100 border border-green-400 text-green-700 text-center
+                      {% else %} bg-gray-100 border border-gray-400 text-gray-700 {% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="bg-white border border-slate-200 rounded-2xl md:rounded-[2rem] shadow-sm overflow-hidden mb-8 animate-fade">
+        <div class="bg-slate-900 p-6 md:p-10">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="space-y-1">
+                    <span class="text-blue-400 text-[10px] font-black uppercase tracking-[0.2em]">Tema do Trabalho</span>
+                    <h3 class="text-white text-lg md:text-2xl font-bold leading-tight break-words">
+                        {{ tema.titulo }}
+                    </h3>
+                    <p class="text-slate-400 text-xs md:text-sm mt-2 line-clamp-2">{{ tema.descricao }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 md:p-10 border-b border-slate-100 bg-white">
+            <h4 class="text-slate-800 font-bold mb-4 flex items-center gap-2">
+                <span class="material-icons-sharp text-blue-500">add_comment</span>
+                Nova Recomendação
+            </h4>
+            <form method="POST" action="{% url 'tutor_recomendacao' tema.id %}" class="space-y-4">
+                {% csrf_token %}
+                <textarea name="texto" rows="3" 
+                          class="w-full p-4 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-400 text-sm md:text-base"
+                          placeholder="Digite aqui as orientações para o estudante..." required></textarea>
+                
+                <div class="flex justify-end">
+                    <button type="submit" 
+                            class="w-full md:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 active:scale-95">
+                        <span class="material-icons-sharp text-sm">send</span>
+                        Enviar para o Estudante
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-2xl md:rounded-[2rem] shadow-sm overflow-hidden animate-fade">
+        <div class="p-4 md:p-10 bg-slate-50/30">
+            <h4 class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-8 text-center md:text-left">
+                Histórico de Interações
+            </h4>
+
+            {% if recomendacoes %}
+                <div class="space-y-6 md:space-y-8">
+                    {% for rec in recomendacoes %}
+                    <div class="flex gap-4 md:gap-8 group">
+                        
+                        <div class="flex flex-col items-center flex-shrink-0">
+                            <div class="flex-none w-9 h-9 md:w-11 md:h-11 rounded-xl bg-white border-2 border-slate-200 text-slate-400 flex items-center justify-center text-sm md:text-lg font-bold transition-all duration-300 {% if rec.cumprida %}bg-green-500 border-green-500 text-white{% endif %}">
+                                {% if rec.cumprida %}
+                                    <span class="material-icons-sharp">check</span>
+                                {% else %}
+                                    {{ forloop.revcounter }}
+                                {% endif %}
+                            </div>
+                            {% if not forloop.last %}
+                            <div class="w-px h-full bg-slate-200 mt-3"></div>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex-1 pb-8">
+                            <div class="bg-white border border-slate-200 rounded-2xl p-5 md:p-7 shadow-sm transition-all duration-300 hover:border-blue-200">
+                                <div class="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-slate-50 pb-3">
+                                    <div class="flex items-center gap-3">
+                                        {% if rec.cumprida %}
+                                            <span class="px-3 py-1 bg-green-100 text-green-700 text-[9px] font-black uppercase rounded-full flex items-center gap-1">
+                                                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Cumprido
+                                            </span>
+                                        {% else %}
+                                            <span class="px-3 py-1 bg-amber-100 text-amber-700 text-[9px] font-black uppercase rounded-full flex items-center gap-1">
+                                                <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span> Pendente
+                                            </span>
+                                        {% endif %}
+                                        
+                                        <span class="text-[10px] text-slate-400 font-medium">
+                                            <i class="far fa-calendar-alt mr-1"></i> {{ rec.data_criacao|date:"d M Y" }}
+                                        </span>
+                                    </div>
+
+                                    <form method="POST" action="#"> {% csrf_token %}
+                                        <input type="hidden" name="rec_id" value="{{ rec.id }}">
+                                        <button type="submit" class="text-xs font-bold {% if rec.cumprida %}text-slate-300 cursor-not-allowed{% else %}text-blue-600 hover:text-blue-800{% endif %}" {% if rec.cumprida %}disabled{% endif %}>
+                                            {% if not rec.cumprida %}Marcar Cumprido{% endif %}
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <p class="text-slate-700 text-sm md:text-base leading-[1.8] break-words {% if rec.cumprida %}line-through opacity-50{% endif %}">
+                                    {{ rec.texto }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <p class="text-slate-400 italic">Nenhuma recomendação enviada para este tema.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .break-words { word-wrap: break-word; word-break: break-word; }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fadeSlide { animation: fadeSlide 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+    .animate-fade { animation: fadeIn 1s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+{% endblock %}

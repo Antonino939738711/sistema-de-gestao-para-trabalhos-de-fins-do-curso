@@ -1,0 +1,263 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Criar Conta — Portal ISPB</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+    /* Estilo para suavizar a transição das bordas de validação */
+    .input-transition {
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-black text-gray-200 min-h-screen font-sans selection:bg-cyan-400 selection:text-black">
+
+<section class="relative min-h-screen flex items-center justify-center bg-cover bg-center"
+         style="background-image:url('{% static "imgs/secretario.jpg" %}');">
+
+  <div class="absolute inset-0 bg-black/75 backdrop-blur-sm"></div>
+
+  <main class="relative z-10 w-full max-w-5xl mx-4 bg-gray-900/85 backdrop-blur-xl
+               rounded-3xl shadow-2xl p-8 md:p-10
+               animate-[fadeIn_0.6s_ease-out]">
+
+    <div class="grid md:grid-cols-2 gap-10">
+
+      <aside class="hidden md:flex flex-col justify-center text-center">
+        <img src="{% static 'imgs/icons/finalispbie.jpg' %}" alt="Logo ISPB"
+             class="mx-auto w-28 h-28 rounded-full border-4 border-cyan-400 shadow-lg mb-6">
+        <h1 class="text-3xl font-bold text-white mb-3">Portal ISPB — TFC</h1>
+        <p class="text-gray-400 leading-relaxed">
+          Crie a sua conta para gerir e acompanhar os
+          <span class="text-cyan-400 font-semibold">Trabalhos de Fim de Curso</span>
+          no Instituto Superior Politécnico do Bié.
+        </p>
+      </aside>
+
+      <section>
+        <h2 class="text-2xl font-bold text-cyan-400 text-center mb-6">Criar Conta</h2>
+
+        {% if messages %}
+          <div class="mb-5 space-y-2" role="alert">
+            {% for message in messages %}
+              <div class="px-4 py-3 rounded-xl text-sm font-medium
+                {% if message.tags == 'error' %}bg-red-500/15 text-red-400 border border-red-500/30
+                {% elif message.tags == 'success' %}bg-green-500/15 text-green-400 border border-green-500/30
+                {% else %}bg-yellow-500/15 text-yellow-300 border border-yellow-500/30{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <form method="post" id="cadastroForm" class="space-y-5">
+          {% csrf_token %}
+
+          <div>
+            <label class="block text-sm font-medium text-gray-300">Nome completo</label>
+            <input type="text" name="nome_completo" id="nome_completo" required
+                   value="{{ request.POST.nome_completo }}"
+                   placeholder="Ex: Antonino C.J Teodoro"
+                   class="mt-1 w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700
+                          focus:ring-2 focus:ring-cyan-400 focus:outline-none input-transition">
+            <p id="nomeError" class="text-xs text-red-500 mt-1 hidden">
+              Use o formato: Antonino Calado Jacob Teodoro ou Antonino C.J Teodoro
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-300">Email</label>
+            <input type="email" name="email" required
+                   value="{{ request.POST.email }}"
+                   class="mt-1 w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700
+                          focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-300">Telefone</label>
+              <input type="text" name="telefone" maxlength="9" required
+                     value="{{ request.POST.telefone }}"
+                     class="mt-1 w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700
+                            focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-300">Perfil</label>
+              <select name="perfil" id="perfil" required
+                      class="mt-1 w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700
+                             focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+                <option value="" disabled selected>Selecione…</option>
+                <option value="cordenacao">Coordenação</option>
+                <option value="dac">DAAC</option>
+                <option value="presidente">Presidencia</option>
+                <option value="estudante">Estudante</option>
+                <option value="tutor">Orientador</option>
+                <option value="area_cientifica">Área Científica</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="camposcordenacao" class="hidden">
+            <label class="block text-sm font-medium text-gray-300">Departamento</label>
+            <select name="departamento"
+                    class="mt-1 w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700
+                           focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+              {% for departamento in departamentos %}
+                <option value="{{ departamento.id }}">{{ departamento.nome }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div id="camposestudante" class="hidden">
+            <label class="block text-sm font-medium text-gray-300">Curso</label>
+            <select name="curso"
+                    class="mt-1 w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700
+                           focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+              {% for curso in cursos %}
+                <option value="{{ curso.id }}">{{ curso.nome }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-300">Senha</label>
+              <input type="password" id="senha1" name="password1" required
+                     class="mt-1 w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700
+                            focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+              <button type="button"
+                      onclick="toggleSenha('senha1','eye1')"
+                      class="absolute right-4 top-11 text-gray-400 hover:text-cyan-400">
+                <i id="eye1" class="bx bx-hide text-xl"></i>
+              </button>
+            </div>
+
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-300">Confirmar senha</label>
+              <input type="password" id="senha2" name="password2" required
+                     class="mt-1 w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700
+                            focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+              <button type="button"
+                      onclick="toggleSenha('senha2','eye2')"
+                      class="absolute right-4 top-11 text-gray-400 hover:text-cyan-400">
+                <i id="eye2" class="bx bx-hide text-xl"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit"
+                  class="w-full py-3 rounded-xl bg-cyan-400 text-black font-bold
+                         hover:bg-cyan-300 active:scale-95 transition-all
+                         focus:outline-none focus:ring-2 focus:ring-cyan-500">
+            Criar Conta
+          </button>
+        </form>
+
+        <p class="mt-6 text-center text-sm text-gray-400">
+          Já tem conta?
+          <a href="{% url 'login' %}" class="text-cyan-400 font-semibold hover:underline">
+            Entrar
+          </a>
+        </p>
+      </section>
+    </div>
+  </main>
+</section>
+
+<script>
+  // --- Lógica de Interface Existente ---
+  const perfil = document.getElementById("perfil");
+  const cordenacao = document.getElementById("camposcordenacao");
+  const estudante = document.getElementById("camposestudante");
+
+  perfil.addEventListener("change", () => {
+    cordenacao.classList.toggle("hidden", perfil.value !== "cordenacao");
+    estudante.classList.toggle("hidden", perfil.value !== "estudante");
+  });
+
+  function toggleSenha(inputId, eyeId) {
+    const input = document.getElementById(inputId);
+    const eye = document.getElementById(eyeId);
+    const visible = input.type === "text";
+    input.type = visible ? "password" : "text";
+    eye.className = visible ? "bx bx-hide text-xl" : "bx bx-show text-xl";
+  }
+
+  // --- Validação Dinâmica do Nome Completo (CORRIGIDA) ---
+  const inputNome = document.getElementById('nome_completo');
+  const nomeError = document.getElementById('nomeError');
+  const form = document.getElementById('cadastroForm');
+
+  const validarNome = (nome) => {
+    /**
+     * Explicação da Regex:
+     * ^[A-ZÀ-Ÿ][a-zà-ÿ]+      -> Começa com Nome (Maiúscula + minúsculas)
+     * (                       -> Grupo do meio (nomes ou iniciais)
+     * \s                    -> Espaço obrigatório antes
+     * ([A-ZÀ-Ÿ][a-zà-ÿ]+    -> Nome completo (ex: Calado)
+     * |                    -> OU
+     * [A-Z](\.[A-Z])* -> Inicial c/ ponto (ex: C. ou C.J)
+     * )
+     * )* -> Repete zero ou mais vezes
+     * \s[A-ZÀ-Ÿ][a-zà-ÿ]+     -> Exige um Sobrenome final completo
+     * $                       -> Fim
+     */
+    const regex = /^[A-ZÀ-Ÿ][a-zà-ÿ]+(\s([A-ZÀ-Ÿ][a-zà-ÿ]+|[A-Z](\.[A-Z])*))*\s[A-ZÀ-Ÿ][a-zà-ÿ]+$/;
+    return regex.test(nome.trim());
+  };
+
+  inputNome.addEventListener('input', () => {
+    const valor = inputNome.value;
+    
+    if (valor.length === 0) {
+      inputNome.classList.remove('border-green-500', 'border-red-500');
+      nomeError.classList.add('hidden');
+      return;
+    }
+
+    if (validarNome(valor)) {
+      // Estado Válido
+      inputNome.classList.replace('border-gray-700', 'border-green-500');
+      inputNome.classList.remove('border-red-500');
+      inputNome.classList.add('focus:ring-green-400');
+      nomeError.classList.add('hidden');
+    } else {
+      // Estado Inválido
+      inputNome.classList.remove('border-green-500', 'border-gray-700');
+      inputNome.classList.add('border-red-500', 'focus:ring-red-400');
+      nomeError.classList.remove('hidden');
+    }
+  });
+
+  // Validação final ao enviar
+  form.addEventListener('submit', (e) => {
+    if (!validarNome(inputNome.value)) {
+      e.preventDefault();
+      inputNome.focus();
+      // Pequeno efeito de "shake" no campo se estiver errado
+      inputNome.animate([
+        { transform: 'translateX(0)' },
+        { transform: 'translateX(5px)' },
+        { transform: 'translateX(-5px)' },
+        { transform: 'translateX(0)' }
+      ], { duration: 300 });
+    }
+  });
+</script>
+
+</body>
+</html>

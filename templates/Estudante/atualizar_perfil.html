@@ -1,0 +1,130 @@
+{% extends "Estudante/base.html" %}
+{% load static %}
+
+{% block titulo_pagina %}Actualizar Perfil{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[calc(100vh-5rem)] flex items-center">
+
+  <div class="w-full bg-white rounded-2xl shadow-sm border overflow-hidden">
+
+    <!-- Cabeçalho -->
+    <div class="px-6 py-4 border-b">
+      <h2 class="text-lg font-semibold text-gray-800">
+        Actualizar Perfil
+      </h2>
+      <p class="text-sm text-gray-500">
+        Informações pessoais da conta
+      </p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data"
+          class="p-5 space-y-5">
+      {% csrf_token %}
+
+      <!-- FOTO + UPLOAD -->
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+
+        <div class="flex justify-center sm:justify-start">
+          {% if request.user.imagem %}
+            <img src="{{ request.user.imagem.url }}"
+                 class="w-20 h-20 rounded-full object-cover border shadow-sm">
+          {% else %}
+            <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center border">
+              <span class="material-icons-sharp text-3xl text-gray-400">person</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="w-full">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Foto de perfil
+          </label>
+          <input type="file" name="imagem"
+                 class="w-full text-sm text-gray-600
+                        file:mr-3 file:py-2 file:px-4
+                        file:rounded-xl file:border-0
+                        file:bg-blue-50 file:text-blue-600
+                        hover:file:bg-blue-100">
+        </div>
+      </div>
+
+      <!-- DADOS -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">
+            Perfil
+          </label>
+          <input type="text" disabled
+                 value="{{ request.user.perfil }}"
+                 class="mt-1 w-full rounded-xl bg-gray-100 border-gray-300 text-gray-500 px-4 py-2.5">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">
+            Telefone
+          </label>
+          <input type="text" name="telefone"
+                 value="{{ request.user.telefone }}"
+                 class="mt-1 w-full rounded-xl border-gray-300 px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">
+            Nome
+          </label>
+          <input type="text" name="nome" required
+                 value="{{ request.user.nome }}"
+                 class="mt-1 w-full rounded-xl border-gray-300 px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">
+            Sobrenome
+          </label>
+          <input type="text" name="sobrenome" required
+                 value="{{ request.user.sobrenome }}"
+                 class="mt-1 w-full rounded-xl border-gray-300 px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+      </div>
+
+      <!-- ALTERAR SENHA (COLAPSÁVEL) -->
+      <details class="bg-gray-50 rounded-2xl p-4">
+        <summary class="cursor-pointer font-semibold text-gray-700 select-none">
+          Alterar Senha
+        </summary>
+
+        <div class="mt-4 space-y-3">
+          <input type="password" name="senha_atual"
+                 placeholder="Senha actual"
+                 class="w-full rounded-xl border-gray-300 px-4 py-2.5 focus:ring-blue-500">
+
+          <input type="password" name="nova_senha"
+                 placeholder="Nova senha"
+                 class="w-full rounded-xl border-gray-300 px-4 py-2.5 focus:ring-blue-500">
+
+          <input type="password" name="confirmar_senha"
+                 placeholder="Confirmar nova senha"
+                 class="w-full rounded-xl border-gray-300 px-4 py-2.5 focus:ring-blue-500">
+        </div>
+      </details>
+
+      <!-- BOTÕES -->
+      <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
+
+        <a href="{% url 'dashboard_estudante' %}"
+           class="w-full sm:w-auto text-center px-5 py-2.5 rounded-xl border text-gray-600 hover:bg-gray-50">
+          Cancelar
+        </a>
+
+        <button type="submit"
+                class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700">
+          Guardar
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}
