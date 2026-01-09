@@ -3,7 +3,7 @@
   "builds": [
     {
       "src": "SGTFC/wsgi.py",
-      "use": "@vercel/python3",
+      "use": "@vercel/python",
       "config": { "maxLambdaSize": "50mb" }
     }
   ],
