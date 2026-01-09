@@ -8,6 +8,11 @@
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "SGTFC/wsgi.py" }
-  ]
+    {
+      "src": "/(.*)",
+      "dest": "SGTFC/wsgi.py"
+    }
+  ],
+  "env": {},
+  "buildCommand": "python manage.py collectstatic --noinput && python manage.py migrate"
 }

@@ -7,8 +7,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Coordenacao.urls')),
     path('chat/', include('chat.urls')),
-
 ]
-# Rodar Todos os arquivos de media (Ao fazer uploads de documentos , fotos , videos , imagens ...) Tela Preta Mesmo .... 
+
+# Servir media em DEBUG apenas (uploads)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

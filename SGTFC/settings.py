@@ -3,7 +3,7 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ⚠️ Hardcoded para teste
+# ⚠️ Hardcoded para teste / produção na Vercel
 SECRET_KEY = 'django-insecure-o10(c6z45(wq6ur-5ju$c!ln!-=^2yqs=tp3bhzp3b=)amtp^8'
 
 DEBUG = False
@@ -15,7 +15,7 @@ ALLOWED_HOSTS = [
 ]
 
 INSTALLED_APPS = [
-    'whitenoise.runserver_nostatic',  # Para produção
+    'whitenoise.runserver_nostatic',  # Serve arquivos estáticos em produção
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,8 +56,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'SGTFC.wsgi.application'
+ASGI_APPLICATION = 'SGTFC.asgi.application'
 
-# ⚠️ Hardcoded DB para teste
+# ⚠️ Configuração DB Hardcoded para Vercel
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -95,5 +96,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Segurança Vercel
 CSRF_TRUSTED_ORIGINS = ["https://*.vercel.app"]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
