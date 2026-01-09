@@ -4,14 +4,13 @@ from pathlib import Path
 # Caminhos base
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SEGURANÇA: Mantenha em segredo em produção
-SECRET_KEY = 'django-insecure-uod+*=%7@x**swxug7=sfcom6nlrcbu@8z^1gjy4ch30jnoyp8'
+# SEGURANÇA
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-uod+*=%7@x**swxug7=sfcom6nlrcbu@8z^1gjy4ch30jnoyp8')
 
-# DEBUG deve ser False em produção real, mas True para testes
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-# Permite acesso via localhost, IP da rede e Ngrok
-ALLOWED_HOSTS = ["*", "6bc4a50434b2.ngrok-free.app"]
+# Configuração de Hosts para Vercel e Local
+ALLOWED_HOSTS = ["*", ".vercel.app", "6bc4a50434b2.ngrok-free.app", "localhost", "127.0.0.1"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -26,6 +25,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -39,7 +39,7 @@ ROOT_URLCONF = 'SGTFC.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -53,18 +53,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'SGTFC.wsgi.application'
 
-# Banco de Dados
+# Banco de Dados - Railway PostgreSQL
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': 'PJsvXqimekzpfOGEiqpGxrOuKfBzvYHK',
+        'HOST': 'postgres.railway.internal',
+        'PORT': '5432',
     }
 }
 
 # Usuário Personalizado
 AUTH_USER_MODEL = "Coordenacao.Usuario"
 
-# Validadores de senha
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -72,23 +75,24 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Configurações de CSRF para o Ngrok funcionar sem erros 403
+# Configurações de CSRF
 CSRF_TRUSTED_ORIGINS = [
+    "https://*.vercel.app",
     "https://6bc4a50434b2.ngrok-free.app",
 ]
 
-# Internacionalização
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# Arquivos Estáticos (CSS, JS, Imagens)
+# Arquivos Estáticos (Configuração para Vercel)
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Upload de Arquivos de Mídia
+# Mídia
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
